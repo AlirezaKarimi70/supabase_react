@@ -3,17 +3,39 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import { supabase } from './lib/supabase-client'
 
 function App() {
+  const [newTask, setNewTask] = useState({ title: "", description: "" })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-
+    const { error } = await supabase.from("tasks").insert(newTask).single();
+    if (error) {
+      console.error("Error inserting task:", error);
+    } else {
+      setNewTask({ title: "", description: "" });
+      console.log("Task inserted successfully");
+    }
+  }
   return (
     <>
       <div style={{ maxWidth: "600px", margin: "0 auto", padding: "1rem" }}>
         <h2> Task Manager Crud</h2>
-        <form style={{ marginBottom: "1rem" }}>
-          <input type="text" placeholder='Enter Task' style={{ padding: "0.5rem", width: "100%", marginBottom: "0.5rem" }} />
-          <textarea placeholder='Enter Description' style={{ padding: "0.5rem", width: "100%", marginBottom: "0.5rem" }}></textarea>
+        <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
+          <input type="text"
+            onChange={(e) =>
+              setNewTask((prev) => ({ ...prev, title: e.target.value }))
+
+            }
+            placeholder='Enter Task' style={{ padding: "0.5rem", width: "100%", marginBottom: "0.5rem" }} />
+          <textarea
+            placeholder='Enter Description'
+            onChange={(e) =>
+              setNewTask((prev) => ({ ...prev, description: e.target.value }))
+
+            }
+            style={{ padding: "0.5rem", width: "100%", marginBottom: "0.5rem" }}></textarea>
           <button type='submit' style={{ padding: "0.5rem 1rem", backgroundColor: "#007BFF", color: "#fff", border: "none", borderRadius: "4px" }}>Add Task</button>
         </form>
         {/* Task List */}
