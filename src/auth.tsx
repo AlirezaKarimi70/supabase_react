@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { supabase } from './lib/supabase-client';
 
 export default function Auth() {
-    const [isSignUp, setIsSignUp] = React.useState(false);
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
+    const [isSignUp, setIsSignUp] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const handelSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         if (isSignUp) {
             const { data, error } = await supabase.auth.signUp({
                 email: email,

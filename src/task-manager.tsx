@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase-client'
+import type { Session } from '@supabase/supabase-js';
 interface Task {
     id: number;
     title: string;
     description: string;
     created_at: string;
 }
-const TaskManager = () => {
+const TaskManager = ({ session }: { session: Session }) => {
     const [newTask, setNewTask] = useState({ title: "", description: "" });
     const [tasks, setTasks] = useState<Task[]>([]);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const { error } = await supabase.from("tasks").insert(newTask).single();
+        const { error } = await supabase.from("tasks").insert({ ...newTask, email: session.user.email, user_id: session.user.id }).single();
         if (error) {
             console.error("Error inserting task:", error);
             return

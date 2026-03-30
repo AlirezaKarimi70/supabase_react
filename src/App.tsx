@@ -1,7 +1,5 @@
 
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+
 import './App.css'
 import TaskManager from './task-manager'
 import Auth from './auth'
@@ -14,17 +12,37 @@ function App() {
   const fetchSession = async () => {
     const currentSession = await supabase.auth.getSession();
     console.log("Current Session:", currentSession);
-    setSession(currentSession.data);
+    setSession(currentSession.data.session);
+  }
+  const logout = async () => {
+    supabase.auth.signOut();
   }
   useEffect(() => {
     fetchSession();
-
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event, "Session:", session);
+      setSession(session);
+    });
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, [])
   return (
     <>
-      <TaskManager />
+      {
+        session ? (
+          <>
+            <button onClick={logout}>Logout</button>
+            <TaskManager session={session} />
+          </>
 
-      <Auth />
+        ) :
+          (<Auth />)
+
+      }
+
+
+
     </>
 
   )
